@@ -33,14 +33,14 @@ static void resolve_callback(
 	case AVAHI_RESOLVER_FAILURE:
 	    fprintf(stderr, "(Resolver) Failed to resolve service '%s' of type '%s' in domain '%s': %s\n", name, type, domain, avahi_strerror(avahi_client_errno(avahi_service_resolver_get_client(r))));
 	    break;
-				
+	
 	case AVAHI_RESOLVER_FOUND: 
 	{
 	    char a[AVAHI_ADDRESS_STR_MAX], *text, *hostname_keypair, *hostname;
 	    AvahiStringList *list_hostname;
-		    
+	
 	    fprintf(stderr, "Service '%s' of type '%s' in domain '%s':\n", name, type, domain);
-				
+	
 	    avahi_address_snprint(a, sizeof(a), address);
 	    text = avahi_string_list_to_string(txt);
 	    
@@ -83,7 +83,7 @@ static void resolve_callback(
     }
     
     avahi_service_resolver_free(r);
-}						    
+}
 
 /* Called whenever a new services becomes available on the LAN or is removed from the LAN */
 
@@ -104,7 +104,7 @@ static void browse_callback(
     {
 	case AVAHI_BROWSER_FAILURE:
 	    fprintf(stderr, "(Browser) %s\n", avahi_strerror(avahi_client_errno(avahi_service_browser_get_client(b))));
-	    avahi_simple_poll_quit(simple_poll);	    
+	    avahi_simple_poll_quit(simple_poll);
 	    return;
 	
 	case AVAHI_BROWSER_NEW:
@@ -150,7 +150,7 @@ static void client_callback(AvahiClient *c, AvahiClientState state, void *userda
 int main(int argc, char *argv[])
 {
     AvahiClient *client;
-    AvahiServiceBrowser *browser;    
+    AvahiServiceBrowser *browser;
     int error;
     
     if((simple_poll = avahi_simple_poll_new()) == NULL)
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
     
     printf("}\n");
     
-    avahi_service_browser_free(browser);    
+    avahi_service_browser_free(browser);
     avahi_client_free(client);
     avahi_simple_poll_free(simple_poll);
 
