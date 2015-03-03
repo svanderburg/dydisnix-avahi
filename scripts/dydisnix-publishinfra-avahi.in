@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+@avahi_publish_service@ disnix-$(hostname) _disnix._tcp 22 \
+  "hostname=$(hostname)" \
+  "mem=$(grep 'MemTotal:' /proc/meminfo | sed -e 's/kB//' -e 's/MemTotal://' -e 's/ //g')"
