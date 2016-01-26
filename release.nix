@@ -45,7 +45,9 @@ let
             {
               services.openssh.enable = true;
               services.avahi.enable = true;
-              services.avahi.publishing = true;
+              services.avahi.publish.enable = true;
+              services.avahi.publish.addresses = true;
+              services.avahi.publish.domain = true;
               virtualisation.writableStore = true;
               
               ids.gids = { disnix = 200; };
