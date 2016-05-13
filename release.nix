@@ -48,6 +48,7 @@ let
               services.avahi.publish.enable = true;
               services.avahi.publish.addresses = true;
               services.avahi.publish.domain = true;
+              services.avahi.publish.userServices = true;
               virtualisation.writableStore = true;
               
               ids.gids = { disnix = 200; };
@@ -56,7 +57,7 @@ let
               services.dbus.enable = true;
               services.dbus.packages = [ disnix ];
   
-              jobs.disnix =
+              systemd.services.disnix =
                 { description = "Disnix server";
                   wantedBy = [ "multi-user.target" ];
                   after = [ "dbus.service" ];
@@ -65,20 +66,25 @@ let
                   environment = {
                     HOME = "/root";
                   };
-
-                  exec = "disnix-service";
+                  
+                  serviceConfig.ExecStart = "${disnix}/bin/disnix-service";
                 };
             
-              jobs.dydisnix-publishinfra-avahi =
+              systemd.services.dydisnix-publishinfra-avahi =
                 { description = "DyDisnix Avahi publisher";
                   wantedBy = [ "multi-user.target" ];
                   after = [ "disnix.service" ];
                   requires = [ "avahi-daemon.service" ];
                   
-                  path = [ dydisnix_avahi "/run/current-system/sw" ];
-                  exec = "dydisnix-publishinfra-avahi";
+                  path = [ dydisnix_avahi dysnomia "/run/current-system/sw" ];
+                  serviceConfig.ExecStart = "${dydisnix_avahi}/bin/dydisnix-publishinfra-avahi";
                 };
-                
+            
+              environment.etc."dysnomia/properties".text = ''
+                hostname="$(hostname)"
+                mem="$(grep 'MemTotal:' /proc/meminfo | sed -e 's/kB//' -e 's/MemTotal://' -e 's/ //g')"
+              '';
+              
               environment.systemPackages = [
                 dydisnix_avahi pkgs.stdenv
                 pkgs.busybox pkgs.paxctl pkgs.gnumake pkgs.patchelf pkgs.gcc pkgs.perlPackages.ArchiveCpio # Required to build something in the VM
@@ -90,7 +96,7 @@ let
           $machine->waitForJob("dydisnix-publishinfra-avahi.service");
           $machine->mustSucceed("sleep 10");
           $machine->mustSucceed("dydisnix-geninfra-avahi > infrastructure.nix");
-          $machine->mustSucceed("[ \"\$(grep \"mem=\" infrastructure.nix)\" != \"\" ]");
+          $machine->mustSucceed("[ \"\$(grep \"properties.mem=\" infrastructure.nix)\" != \"\" ]");
         '';
       };
   };
