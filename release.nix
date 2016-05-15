@@ -33,7 +33,6 @@ let
       let
         dysnomia = builtins.getAttr (builtins.currentSystem) (dysnomiaJobset.build);
         disnix = builtins.getAttr (builtins.currentSystem) (disnixJobset.build);
-        dydisnix_avahi = builtins.getAttr (builtins.currentSystem) build;
       in
       with import "${nixpkgs}/nixos/lib/testing.nix" { system = builtins.currentSystem; };
       
@@ -43,12 +42,12 @@ let
             {config, pkgs, ...}:
             
             {
+              imports = [ ./dydisnix-avahi-module.nix ];
+              
+              services.dydisnixAvahiTest.enable = true;
+              services.dydisnixAvahiTest.dysnomia = dysnomia;
+              
               services.openssh.enable = true;
-              services.avahi.enable = true;
-              services.avahi.publish.enable = true;
-              services.avahi.publish.addresses = true;
-              services.avahi.publish.domain = true;
-              services.avahi.publish.userServices = true;
               virtualisation.writableStore = true;
               
               ids.gids = { disnix = 200; };
@@ -70,23 +69,13 @@ let
                   serviceConfig.ExecStart = "${disnix}/bin/disnix-service";
                 };
             
-              systemd.services.dydisnix-publishinfra-avahi =
-                { description = "DyDisnix Avahi publisher";
-                  wantedBy = [ "multi-user.target" ];
-                  after = [ "disnix.service" ];
-                  requires = [ "avahi-daemon.service" ];
-                  
-                  path = [ dydisnix_avahi dysnomia "/run/current-system/sw" ];
-                  serviceConfig.ExecStart = "${dydisnix_avahi}/bin/dydisnix-publishinfra-avahi";
-                };
-            
               environment.etc."dysnomia/properties".text = ''
                 hostname="$(hostname)"
                 mem="$(grep 'MemTotal:' /proc/meminfo | sed -e 's/kB//' -e 's/MemTotal://' -e 's/ //g')"
               '';
               
               environment.systemPackages = [
-                dydisnix_avahi pkgs.stdenv
+                pkgs.stdenv
                 pkgs.busybox pkgs.paxctl pkgs.gnumake pkgs.patchelf pkgs.gcc pkgs.perlPackages.ArchiveCpio # Required to build something in the VM
               ];
             };
