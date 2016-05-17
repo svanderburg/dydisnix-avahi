@@ -46,6 +46,7 @@ let
               
               services.dydisnixAvahiTest.enable = true;
               services.dydisnixAvahiTest.dysnomia = dysnomia;
+              services.avahi.interfaces = [ "eth1" ]; # Only bind to one network interface, otherwise the machine appears multiple times in the generated infrastructure model
               
               services.openssh.enable = true;
               virtualisation.writableStore = true;
@@ -72,6 +73,7 @@ let
               environment.etc."dysnomia/properties".text = ''
                 hostname="$(hostname)"
                 mem="$(grep 'MemTotal:' /proc/meminfo | sed -e 's/kB//' -e 's/MemTotal://' -e 's/ //g')"
+                supportedTypes=("process" "wrapper")
               '';
               
               environment.systemPackages = [
@@ -85,7 +87,11 @@ let
           $machine->waitForJob("dydisnix-publishinfra-avahi.service");
           $machine->mustSucceed("sleep 10");
           $machine->mustSucceed("dydisnix-geninfra-avahi > infrastructure.nix");
-          $machine->mustSucceed("[ \"\$(grep \"properties.mem=\" infrastructure.nix)\" != \"\" ]");
+          
+          # Check if the output of the generated expression matches some things we expect
+          $machine->mustSucceed("[ \"\$(grep \"  \\\"machine\\\" = {\" infrastructure.nix)\" != \"\" ]");
+          $machine->mustSucceed("[ \"\$(grep \"    properties.\\\"mem\\\"=\" infrastructure.nix)\" != \"\" ]");
+          $machine->mustSucceed("[ \"\$(grep \"    properties.\\\"supportedTypes\\\"=\\[ \\\"process\\\"\" infrastructure.nix)\" != \"\" ]");
         '';
       };
   };

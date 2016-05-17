@@ -32,12 +32,12 @@ generateConfig()
         else
             if [ "$containerFollows" = "1" ]
             then
-                assignment=$(echo "${line:7:-2}" | sed 's/" = "/=/')
+                assignment=$(echo "${line:6:-1}" | sed 's/" = /"=/')
             else
-                assignment=$(echo "${line:5:-2}" | sed 's/" = "/=/')
+                assignment=$(echo "${line:4:-1}" | sed 's/" = /"=/')
             fi
             
-            echo "$prefix$assignment"
+            echo "'$prefix$assignment'"
         fi
     done
 }
