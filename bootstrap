@@ -2,6 +2,7 @@
 
 rm -f config.cache config.log acconfig.h aclocal.m4
 
+ln -s README.md README
 mkdir -p config
 aclocal -I .
 autoconf -f
