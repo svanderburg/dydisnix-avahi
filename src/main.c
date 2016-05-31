@@ -63,7 +63,7 @@ static void resolve_callback(
 		    !!(flags & AVAHI_LOOKUP_RESULT_CACHED));
 	    
 	    list_hostname = avahi_string_list_find(txt, "properties.\"hostname\"");
-	    hostname_keypair = avahi_string_list_get_text(list_hostname);
+	    hostname_keypair = (char*)avahi_string_list_get_text(list_hostname);
 	    hostname = strndup(hostname_keypair + 22, strlen(hostname_keypair) - 22); /* Get the value after the key= minus the surrounding " */
 	    
 	    printf("  %s = {\n", hostname);
