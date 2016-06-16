@@ -2,12 +2,27 @@
 , systems ? [ "i686-linux" "x86_64-linux" ]
 , officialRelease ? false
 , dydisnix_avahi ? {outPath = ./.; rev = 1234;}
-, dysnomiaJobset ? import ../dysnomia/release.nix { inherit nixpkgs systems officialRelease; }
-, disnixJobset ? import ../disnix/release.nix { inherit nixpkgs systems officialRelease; }
+, fetchDependenciesFromNixpkgs ? false
 }:
 
 let
   pkgs = import nixpkgs {};
+  
+  # Refer either to dysnomia in the parent folder, or to the one in Nixpkgs
+  dysnomiaJobset = if fetchDependenciesFromNixpkgs then {
+    build = pkgs.lib.genAttrs systems (system:
+      (import nixpkgs { inherit system; }).dysnomia
+    );
+  } else import ../dysnomia/release.nix { inherit nixpkgs systems officialRelease; };
+  
+  # Refer either to disnix in the parent folder, or to the one in Nixpkgs
+  disnixJobset = if fetchDependenciesFromNixpkgs then {
+    tarball = pkgs.dysnomia.src;
+    
+    build = pkgs.lib.genAttrs systems (system:
+      (import nixpkgs { inherit system; }).disnix
+    );
+  } else import ../disnix/release.nix { inherit nixpkgs systems officialRelease; };
   
   jobs = rec {
     tarball =
@@ -46,6 +61,8 @@ let
               
               services.dydisnixAvahiTest.enable = true;
               services.dydisnixAvahiTest.dysnomia = dysnomia;
+              services.dydisnixAvahiTest.package = builtins.getAttr (builtins.currentSystem) build;
+              
               services.avahi.interfaces = [ "eth1" ]; # Only bind to one network interface, otherwise the machine appears multiple times in the generated infrastructure model
               
               services.openssh.enable = true;
