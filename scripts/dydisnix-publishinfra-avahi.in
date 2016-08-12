@@ -7,37 +7,44 @@ generateConfig()
 
     dysnomia-containers --generate-expr | while read -r line
     do
-        if [ "$containerFollows" = "1" ]
+        if [ "$scope" = "properties" ]
         then
             if [ "$line" = "  };" ]
             then
-                containerFollows=
+                scope=""
             else
-                container=${line:4:-4}
-                prefix="$prefix.$container."
+                assignment=$(echo "${line:4:-1}" | sed 's/" = /"=/')
+                echo "'properties.$assignment'"
+            fi
+        elif [ "$scope" = "containers" ]
+        then
+            if [ "$line" = "  };" ]
+            then
+                scope=""
+            elif [ "$containerScope" != "" ]
+            then
+                if [ "$line" = "    };" ]
+                then
+                    containerScope=""
+                else
+                    assignment=$(echo "${line:6:-1}" | sed 's/" = /"=/')
+                    echo "'containers.$containerScope.$assignment'"
+                fi
+            else
+                containerScope=${line:4:-4}
             fi
         elif [ "$line" = "{" ] || [ "$line" = "}" ]
         then
             true
         elif [ "$line" = "  properties = {" ]
         then
-            prefix="properties."
-        elif [ "$line" = "  };" ]
-        then
-            prefix=""
+            scope="properties"
         elif [ "$line" = "  containers = {" ]
         then
-            prefix="containers."
-            containerFollows=1
+            scope="containers"
         else
-            if [ "$containerFollows" = "1" ]
-            then
-                assignment=$(echo "${line:6:-1}" | sed 's/" = /"=/')
-            else
-                assignment=$(echo "${line:4:-1}" | sed 's/" = /"=/')
-            fi
-            
-            echo "'$prefix$assignment'"
+            assignment=$(echo "${line:2:-1}" | sed 's/" = /"=/')
+            echo "'$assignment'"
         fi
     done
 }
