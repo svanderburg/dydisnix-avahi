@@ -25,9 +25,11 @@ Installation
 Dynamic Disnix is a typical autotools based package which can be compiled and
 installed by running the following commands in a shell session:
 
-    $ ./configure
-    $ make
-    $ make install
+```bash
+$ ./configure
+$ make
+$ make install
+```
 
 Usage
 =====
@@ -38,12 +40,16 @@ Running the server
 To make a target machine in the network discoverable, you should run the server
 on it:
 
-    $ dydisnix-publishinfra-avahi
+```bash
+$ dydisnix-publishinfra-avahi
+```
 
 The above command publishes its properties through mDNS. It uses the output
 of the following Dysnomia command to retrieve the machines properties:
 
-    $ dysnomia-containers --capture-infra
+```bash
+$ dysnomia-containers --capture-infra
+```
 
 Consult the Dysnomia documentation for more information on how to configure
 machine and container properties.
@@ -53,19 +59,21 @@ Running the client
 To automatically discover the configurations of all machines (having the server
 component installed) and generate an infrastructure model from it, run:
 
-    $ dydisnix-geninfra-avahi
-    {
-      "machine1" = {
-        properties."hostname"="machine1";
-        properties."mem"="377648";
-        properties."supportedTypes"=[ "process" "wrapper" ];
-      };
-      "machine2" = {
-        properties."hostname"="machine2";
-        properties."mem"="377648";
-        properties."supportedTypes"=[ "process" "tomcat-webapplication" "wrapper" ];
-      };
-    }
+```bash
+$ dydisnix-geninfra-avahi
+{
+  "machine1" = {
+    properties."hostname"="machine1";
+    properties."mem"="377648";
+    properties."supportedTypes"=[ "process" "wrapper" ];
+  };
+  "machine2" = {
+    properties."hostname"="machine2";
+    properties."mem"="377648";
+    properties."supportedTypes"=[ "process" "tomcat-webapplication" "wrapper" ];
+  };
+}
+```
 
 License
 =======
