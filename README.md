@@ -22,13 +22,20 @@ packages are required:
 
 Installation
 ============
-Dynamic Disnix is a typical autotools based package which can be compiled and
+Dynamic Disnix is a typical GNU Autotools based package which can be compiled and
 installed by running the following commands in a shell session:
 
 ```bash
 $ ./configure
 $ make
 $ make install
+```
+
+When building from the Git repository, you should run the bootstrap script
+first:
+
+```bash
+$ ./bootstrap
 ```
 
 Usage
