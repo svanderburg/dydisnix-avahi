@@ -90,7 +90,6 @@ let
 
               environment.systemPackages = [
                 pkgs.stdenv
-                pkgs.busybox pkgs.paxctl pkgs.gnumake pkgs.patchelf pkgs.gcc pkgs.perlPackages.ArchiveCpio # Required to build something in the VM
               ];
             };
         };
