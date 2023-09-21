@@ -45,6 +45,7 @@ let
       with import "${nixpkgs}/nixos/lib/testing-python.nix" { system = builtins.currentSystem; };
 
       simpleTest {
+        name = "tests";
         nodes = {
           machine =
             {config, pkgs, ...}:
